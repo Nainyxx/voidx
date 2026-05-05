@@ -1,0 +1,5 @@
+package bluetooth
+
+func MainBluetoothComponent() {
+
+}
