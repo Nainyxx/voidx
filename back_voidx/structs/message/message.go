@@ -22,4 +22,14 @@ type Message struct {
 	ID        string    `json:"id"`
 	Content   string    `json:"content"`
 	Timestamp time.Time `json:"timestamp"`
+	SenderMAC string    `json:"sender_mac"`
+}
+
+// ID фидбека формируется из ID сообщения + флага "-f", что означает -feedback
+// При получении любого сообщения/фидбека человек сохраняет MAC адрес отправителя
+
+type Feedback struct {
+	ID                string `json:"id"`
+	Status            int    `json:"status"` // status 200 и тд
+	FeedbackSenderMAC string `json:"feedback_sender_mac"`
 }

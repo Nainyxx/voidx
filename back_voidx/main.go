@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"time"
 	"voidx/scripts/bluetooth"
 )
 
@@ -25,8 +23,5 @@ func main() {
 
 func main() {
 
-	err := bluetooth.ScanDevices(3 * time.Second)
-	if err != nil {
-		fmt.Printf("HUYNYA")
-	}
+	bluetooth.MainBluetoothComponent()
 }
