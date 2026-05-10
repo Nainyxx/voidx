@@ -1,0 +1,16 @@
+.graph {
+  width: 180px;
+  height: 120px;
+  border-radius: 16px;
+  background-color: blueviolet;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.graph-label {
+  font-size: 16px;
+  font-weight: 600;
+}

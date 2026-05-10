@@ -1,0 +1,24 @@
+{
+    "graph_counts": 2,
+    "graph_cords": {
+        "1": {
+            "x": 0,
+            "y": 0
+        },
+        "2": {
+            "x": 100,
+            "y": 500
+        }
+    },
+    
+    "folders": {
+        "all_chats": {
+            "name": "All Chats",
+            "path": "all_chats"
+        },
+        "direct": {
+            "name": "Direct",
+            "path": "direct"
+        }
+    }
+}

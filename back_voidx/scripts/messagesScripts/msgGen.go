@@ -5,6 +5,7 @@ import (
 	"time"
 	"voidx/constants"
 	"voidx/scripts/randomGen"
+	"voidx/structs/message"
 )
 
 func GenerateMsgID(senderPubKey string, readerPubKey string) (string, error) {
@@ -30,4 +31,23 @@ func GenerateMsg(sender string, reader string, content string, timestamp time.Ti
 	Resulted_Message.SenderMAC = "HUYHUYHUY";
 
 	return Resulted_Message, nil;
+}
+
+func GenerateMessage(content string, receiverMAC string) (message.Message, error) {
+	// Для простоты используем MAC как ключи
+	senderPubKey := "senderKey" // В реальности брать из пользователя
+	readerPubKey := "readerKey" // В реальности брать из получателя
+
+	id, err := GenerateMsgID(senderPubKey, readerPubKey)
+	if err != nil {
+		return message.Message{}, err
+	}
+
+	msg := message.Message{
+		ID:        id,
+		Content:   content,
+		Timestamp: time.Now(),
+		SenderMAC: receiverMAC, // В примере используем receiverMAC как senderMAC для теста
+	}
+	return msg, nil
 }
