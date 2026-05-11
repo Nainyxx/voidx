@@ -1,16 +1,33 @@
 .graph {
-  width: 180px;
+  width: 120px;
   height: 120px;
-  border-radius: 16px;
-  background-color: blueviolet;
+  border-radius: 50%;
+  background-color: #7c3aed;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  cursor: grab;
+  transition: box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.graph:hover:not(.graph--dragging) {
+  transform: scale(1.05);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.graph--dragging {
+  cursor: grabbing;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
 }
 
 .graph-label {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
+  text-align: center;
+  word-wrap: break-word;
+  pointer-events: none;
 }
