@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "messenger/proto/gen/user";
+
+service UserService {
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse);
+  rpc SetOnline(SetOnlineRequest) returns (Empty);
+  rpc SetOffline(SetOfflineRequest) returns (Empty);
+}
+
+message User {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string surname = 4;
+  string username = 5;
+  string phone = 6;
+  string description = 7;
+  string avatar_image_url = 8;
+  bool is_online = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+// GET USER
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserResponse {
+  User user = 1;
+}
+
+// UPDATE PROFILE
+message UpdateProfileRequest {
+  string user_id = 1;
+  string name = 2;
+  string surname = 3;
+  string username = 4;
+  string description = 5;
+  string avatar_image_url = 6;
+  string phone = 7;
+}
+
+message UpdateProfileResponse {
+  User user = 1;
+}
+
+// SEARCH USERS
+message SearchUsersRequest {
+  string query = 1;
+  int32 limit = 2;
+}
+
+message SearchUsersResponse {
+  repeated User users = 1;
+}
+
+// SET ONLINE
+message SetOnlineRequest {
+  string user_id = 1;
+}
+
+message SetOfflineRequest {
+  string user_id = 1;
+}
+
+message Empty {}
