@@ -72,7 +72,7 @@ func RegisterUser(name, username, surname, login, email, phone, password string)
 // ChangeName updates user name
 func (u *User) ChangeName(newName string) error {
 	if err := utils.IsNameValid(newName); err != nil {
-		return fmt.Errorf("invalid name: %w", err)
+		return fmt.Errorf("invalidd name: %w", err)
 	}
 	u.Name = newName
 	u.UpdatedAt = time.Now()
