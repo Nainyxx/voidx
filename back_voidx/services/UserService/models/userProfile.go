@@ -32,13 +32,13 @@ func CreateUserProfile(userID uuid.UUID, username, name, surname, phone string) 
 		return nil, creationErr
 	}
 
-	creationErr = utils.IsNameValid(name, "name")
+	creationErr = utils.IsNameValid(name)
 	if creationErr != nil {
 		return nil, creationErr
 	}
 
 	if len(surname) != 0 {
-		creationErr = utils.IsNameValid(surname, "surname")
+		creationErr = utils.IsNameValid(surname)
 		if creationErr != nil {
 			return nil, creationErr
 		}
@@ -78,7 +78,7 @@ func (p *UserProfile) ChangeUsername(newUsername string) error {
 }
 
 func (p *UserProfile) ChangeName(newName string) error {
-	updateErr := utils.IsNameValid(newName, "name")
+	updateErr := utils.IsNameValid(newName)
 	if updateErr != nil {
 		return updateErr
 	}
@@ -93,7 +93,7 @@ func (p *UserProfile) ChangeName(newName string) error {
 }
 
 func (p *UserProfile) ChangeSurname(newSurname string) error {
-	updateErr := utils.IsNameValid(newSurname, "surname")
+	updateErr := utils.IsSurnameValid(newSurname)
 	if updateErr != nil {
 		return updateErr
 	}

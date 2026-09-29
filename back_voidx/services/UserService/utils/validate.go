@@ -23,20 +23,23 @@ func IsEmailValid(email string) error {
 	return nil
 }
 
-func IsNameValid(name, validType string) error {
+func IsNameValid(name string) error {
 	if ContainsOnlyLetter(name) != nil {
-		if validType == "name" {
-			return errors.New("invalid name")
-		} else if validType == "surname" {
-			return errors.New("invalid surname")
-		}
+		return errors.New("invalid name")
+	}
+	return nil
+}
+
+func IsSurnameValid(surname string) error {
+	if ContainsOnlyLetter(surname) != nil {
+		return errors.New("invalid surname")
 	}
 	return nil
 }
 
 func ContainsOnlyLetter(str string) error {
 	for _, v := range str {
-		if !unicode.IsLetter(v) && v != '+' {
+		if !unicode.IsLetter(v) {
 			return errors.New("invalid name")
 		}
 	}
@@ -62,9 +65,23 @@ func IsLoginValid(login string) error {
 }
 
 func IsPhoneValid(phone string) error {
-	if ContainsOnlyNumber(phone) != nil {
+	if phone == "" {
+		return errors.New("phone cannot be empty")
+	}
+
+	digitsOnly := phone
+	if phone[0] == '+' {
+		digitsOnly = phone[1:]
+	}
+
+	if ContainsOnlyNumber(digitsOnly) != nil {
 		return errors.New("invalid phone")
 	}
+
+	if len(digitsOnly) < 10 || len(digitsOnly) > 15 {
+		return errors.New("phone length is invalid")
+	}
+
 	return nil
 }
 
