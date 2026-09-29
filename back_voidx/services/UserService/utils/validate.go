@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 func IsEmailValid(email string) error {
@@ -22,9 +23,13 @@ func IsEmailValid(email string) error {
 	return nil
 }
 
-func IsNameValid(name string) error {
+func IsNameValid(name, validType string) error {
 	if ContainsOnlyLetter(name) != nil {
-		return errors.New("invalid name")
+		if validType == "name" {
+			return errors.New("invalid name")
+		} else if validType == "surname" {
+			return errors.New("invalid surname")
+		}
 	}
 	return nil
 }
@@ -92,5 +97,12 @@ func IsImageURLValid(imageURL string) error {
 		return errors.New("URL must point to a valid image file (.jpg, .png, .webp, etc.)")
 	}
 
+	return nil
+}
+
+func IsDescriptionValid(desc string) error {
+	if utf8.RuneCountInString(desc) > 255 {
+		return errors.New("description is too long")
+	}
 	return nil
 }
