@@ -1,0 +1,64 @@
+syntax = "proto3";
+package user;
+option go_package = "tuzov.user.v1;userv1";
+
+import "google/protobuf/timestamp.proto";
+
+// STRUCTS
+service UserService {
+    rpc GetUserProfileByID (GetUserProfileByIdRequest) returns (GetUserProfileByIdResponse);
+    rpc CreateUserProfile (CreateUserProfileRequest) returns (CreateUserProfileResponse);
+    rpc UpdateUserProfile (UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
+    rpc DeleteUserProfile (DeleteUserProfileRequest) returns (DeleteUserProfileResponse);
+}
+
+message User {
+    string UserID = 1;
+    string Username = 2;
+    string Name = 3;
+    string Surname = 4;
+    string Phone = 5;
+    string Description = 6;
+    string AvatarImageURL = 7;
+    google.protobuf.Timestamp CreatedAt = 8;
+    google.protobuf.Timestamp UpdatedAt = 9;
+}
+
+// REQUESTS
+message GetUserProfileByIdRequest {
+    string UserID = 1;
+}
+
+message CreateUserProfileRequest {
+    string UserID = 1;
+    string Username = 2;
+    string Name = 3;
+    string Surname = 4;
+    string Phone = 5;
+}
+
+message UpdateUserProfileRequest {
+    User UpdatedUser = 1;
+}
+
+message DeleteUserProfileRequest {
+    string UserID = 1;
+}
+
+// RESPONSES
+message GetUserProfileByIdResponse {
+    User user = 1;
+}
+
+message CreateUserProfileResponse {
+    User user = 1;
+}
+
+message UpdateUserProfileResponse {
+    User user = 1;
+}
+
+message DeleteUserProfileResponse {
+    bool status = 1;
+    string error = 2;
+}
