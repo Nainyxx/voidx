@@ -1,0 +1,51 @@
+:root {
+  /* Design tokens — intentionally editable. A future settings panel
+     will let users override these (and set --bg-wallpaper). */
+  --bg-canvas: #fbfaff;
+  --bg-wallpaper: none;
+  --bg-surface: #ffffff;
+  --bg-surface-sunken: #f4f2fa;
+
+  --border-subtle: #e6e2f0;
+  --border-default: #d9d3e8;
+
+  --text-primary: #1c1526;
+  --text-secondary: #766f87;
+  --text-tertiary: #a39cb3;
+
+  --accent: #7e14ff;
+  --accent-hover: #6b0fe0;
+  --accent-soft: #ede6ff;
+  --accent-contrast: #ffffff;
+
+  --status-online: #22c55e;
+
+  --shadow-card: 0 8px 24px rgba(43, 21, 74, 0.10), 0 2px 6px rgba(43, 21, 74, 0.06);
+  --shadow-drag: 0 26px 56px rgba(43, 21, 74, 0.26), 0 8px 18px rgba(43, 21, 74, 0.14);
+  --shadow-modal: 0 24px 64px rgba(43, 21, 74, 0.22);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-canvas);
+}
+
+a {
+  color: var(--accent);
+}
+
+a:hover {
+  color: var(--accent-hover);
+}

@@ -1,46 +1,79 @@
-import graphConfig from '../../data/config/config.json'
+import { seedNodes, seedPositions } from '../../data/graph/nodes'
+import { seedSlots } from '../../data/graph/contacts'
 
-export function getGraphCount() {
-  return graphConfig.graph_counts ?? Object.keys(graphConfig.graph_cords ?? {}).length
+const POSITIONS_KEY = 'voidx_node_positions'
+const SLOTS_KEY = 'voidx_node_slots'
+const EMPTY_SLOTS = [null, null, null, null, null, null]
+
+function readJSON(key, fallback) {
+  const raw = localStorage.getItem(key)
+  return raw ? JSON.parse(raw) : fallback
 }
 
-export function getGraphCoordinates() {
-  const savedCords = localStorage.getItem('graph_cords')
-  const cords = savedCords ? JSON.parse(savedCords) : (graphConfig.graph_cords ?? {})
-  return Object.entries(cords).map(([id, { x, y }]) => ({ id, x, y }))
+export function getNodes() {
+  const positions = readJSON(POSITIONS_KEY, {})
+  return seedNodes.map((node) => {
+    const pos = positions[node.id] ?? seedPositions[node.id] ?? { x: 0, y: 0 }
+    return { ...node, x: pos.x, y: pos.y }
+  })
 }
 
-export function saveGraphCoordinates(graph) {
-  const savedCords = localStorage.getItem('graph_cords')
-  const cords = savedCords ? JSON.parse(savedCords) : (graphConfig.graph_cords ?? {})
-  cords[graph.id] = { x: graph.x, y: graph.y }
-  localStorage.setItem('graph_cords', JSON.stringify(cords))
-  console.log("saved", graph)
+export function saveNodePosition(id, x, y) {
+  const positions = readJSON(POSITIONS_KEY, {})
+  positions[id] = { x: Math.round(x), y: Math.round(y) }
+  localStorage.setItem(POSITIONS_KEY, JSON.stringify(positions))
 }
 
-export function createNewGraph(graphs, x, y) {
-  const newId = Math.max(...graphs.map(g => parseInt(g.id) || 0), 0) + 1
-  const newGraph = {
-    id: String(newId),
-    x: Math.round(x),
-    y: Math.round(y),
+export function updateNodePosition(nodes, id, x, y) {
+  return nodes.map((n) => (n.id === id ? { ...n, x, y } : n))
+}
+
+export function getNodeDepth(nodes, id) {
+  let depth = 0
+  let current = nodes.find((n) => n.id === id)
+  while (current && current.parentId) {
+    depth += 1
+    current = nodes.find((n) => n.id === current.parentId)
   }
-  saveGraphCoordinates(newGraph)
-  return newGraph
+  return depth
 }
 
-export function updateGraphPosition(graphs, draggingId, x, y) {
-  return graphs.map(g =>
-    g.id === draggingId
-      ? { ...g, x, y }
-      : g
-  )
+export function getAncestorChain(nodes, id) {
+  const chain = []
+  let current = nodes.find((n) => n.id === id)
+  while (current) {
+    chain.unshift(current.id)
+    current = current.parentId ? nodes.find((n) => n.id === current.parentId) : null
+  }
+  return chain
 }
 
-export function roundGraphPositions(graphs, draggingId) {
-  return graphs.map(g =>
-    g.id === draggingId
-      ? { ...g, x: Math.round(g.x), y: Math.round(g.y) }
-      : g
-  )
+export function getEdges(nodes) {
+  return nodes
+    .filter((n) => n.parentId)
+    .map((n) => {
+      const parent = nodes.find((p) => p.id === n.parentId)
+      return { id: `${n.parentId}-${n.id}`, parentId: n.parentId, childId: n.id, x1: parent.x, y1: parent.y, x2: n.x, y2: n.y }
+    })
+}
+
+export function getNodeSize(depth) {
+  if (depth === 0) return 96
+  if (depth === 1) return 80
+  return 68
+}
+
+export function getSlots(nodeId) {
+  const allSlots = readJSON(SLOTS_KEY, {})
+  return allSlots[nodeId] ?? seedSlots[nodeId] ?? [...EMPTY_SLOTS]
+}
+
+export function setSlot(nodeId, slotIndex, chatId) {
+  const allSlots = readJSON(SLOTS_KEY, {})
+  const current = allSlots[nodeId] ?? seedSlots[nodeId] ?? [...EMPTY_SLOTS]
+  const updated = [...current]
+  updated[slotIndex] = chatId
+  allSlots[nodeId] = updated
+  localStorage.setItem(SLOTS_KEY, JSON.stringify(allSlots))
+  return updated
 }
