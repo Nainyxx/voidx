@@ -3,7 +3,8 @@ package models
 import (
 	"errors"
 	"time"
-	"uuid"
+
+	"github.com/google/uuid"
 
 	"example.com/m/utils"
 )
@@ -57,8 +58,8 @@ func CreateUserProfile(userID uuid.UUID, username, name, surname, phone string) 
 		Phone:          phone,
 		Description:    "",
 		AvatarImageURL: "",
-		CreatedAt:      time.Now(),
-		UpdatedAt:      time.Now(),
+		CreatedAt:      time.Now().UTC(),
+		UpdatedAt:      time.Now().UTC(),
 	}, nil
 }
 
@@ -72,7 +73,7 @@ func (p *UserProfile) ChangeUsername(newUsername string) error {
 	}
 
 	p.Username = newUsername
-	p.UpdatedAt = time.Now()
+	p.UpdatedAt = time.Now().UTC()
 
 	return nil
 }
@@ -87,7 +88,7 @@ func (p *UserProfile) ChangeName(newName string) error {
 	}
 
 	p.Name = newName
-	p.UpdatedAt = time.Now()
+	p.UpdatedAt = time.Now().UTC()
 
 	return nil
 }
@@ -102,7 +103,22 @@ func (p *UserProfile) ChangeSurname(newSurname string) error {
 	}
 
 	p.Surname = newSurname
-	p.UpdatedAt = time.Now()
+	p.UpdatedAt = time.Now().UTC()
+
+	return nil
+}
+
+func (p *UserProfile) ChangePhone(newPhone string) error {
+	updateErr := utils.IsPhoneValid(newPhone)
+	if updateErr != nil {
+		return updateErr
+	}
+	if newPhone == p.Phone {
+		return errors.New("new phone must be different")
+	}
+
+	p.Phone = newPhone
+	p.UpdatedAt = time.Now().UTC()
 
 	return nil
 }
@@ -117,7 +133,7 @@ func (p *UserProfile) ChangeDescription(newDesc string) error {
 	}
 
 	p.Description = newDesc
-	p.UpdatedAt = time.Now()
+	p.UpdatedAt = time.Now().UTC()
 
 	return nil
 }
@@ -132,7 +148,7 @@ func (p *UserProfile) ChangeAvatarImageURL(imageURL string) error {
 	}
 
 	p.AvatarImageURL = imageURL
-	p.UpdatedAt = time.Now()
+	p.UpdatedAt = time.Now().UTC()
 
 	return nil
 }

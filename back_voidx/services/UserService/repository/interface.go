@@ -2,9 +2,16 @@ package repository
 
 import (
 	"context"
-	"uuid"
+	"errors"
+
+	"github.com/google/uuid"
 
 	"example.com/m/models"
+)
+
+var (
+	ErrNotFound      = errors.New("profile not found")
+	ErrAlreadyExists = errors.New("profile already exists")
 )
 
 type UserRepository interface {

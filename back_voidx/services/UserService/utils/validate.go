@@ -3,6 +3,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"net/mail"
 	"net/url"
 	"strings"
@@ -10,29 +11,41 @@ import (
 	"unicode/utf8"
 )
 
+var ErrValidation = errors.New("validation failed")
+
+func validationErr(msg string) error {
+	return fmt.Errorf("%w: %s", ErrValidation, msg)
+}
+
 func IsEmailValid(email string) error {
 	if email == "" {
-		return errors.New("email cannot be empty")
+		return validationErr("email cannot be empty")
 	}
 
 	_, err := mail.ParseAddress(email)
 	if err != nil {
-		return errors.New("invalid email format")
+		return validationErr("invalid email format")
 	}
 
 	return nil
 }
 
 func IsNameValid(name string) error {
+	if name == "" || utf8.RuneCountInString(name) > 64 {
+		return validationErr("invalid name")
+	}
 	if ContainsOnlyLetter(name) != nil {
-		return errors.New("invalid name")
+		return validationErr("invalid name")
 	}
 	return nil
 }
 
 func IsSurnameValid(surname string) error {
+	if utf8.RuneCountInString(surname) > 64 {
+		return validationErr("invalid surname")
+	}
 	if ContainsOnlyLetter(surname) != nil {
-		return errors.New("invalid surname")
+		return validationErr("invalid surname")
 	}
 	return nil
 }
@@ -40,7 +53,7 @@ func IsSurnameValid(surname string) error {
 func ContainsOnlyLetter(str string) error {
 	for _, v := range str {
 		if !unicode.IsLetter(v) {
-			return errors.New("invalid name")
+			return validationErr("invalid name")
 		}
 	}
 	return nil
@@ -49,16 +62,19 @@ func ContainsOnlyLetter(str string) error {
 func ContainsOnlyNumber(str string) error {
 	for _, v := range str {
 		if !unicode.IsNumber(v) {
-			return errors.New("invalid input")
+			return validationErr("invalid input")
 		}
 	}
 	return nil
 }
 
 func IsLoginValid(login string) error {
+	if login == "" || utf8.RuneCountInString(login) > 32 {
+		return validationErr("invalid login")
+	}
 	for _, v := range login {
 		if !(unicode.IsLetter(v) || unicode.IsNumber(v) || string(v) == "_" || string(v) == "-") {
-			return errors.New("invalid login")
+			return validationErr("invalid login")
 		}
 	}
 	return nil
@@ -66,7 +82,7 @@ func IsLoginValid(login string) error {
 
 func IsPhoneValid(phone string) error {
 	if phone == "" {
-		return errors.New("phone cannot be empty")
+		return validationErr("phone cannot be empty")
 	}
 
 	digitsOnly := phone
@@ -75,11 +91,11 @@ func IsPhoneValid(phone string) error {
 	}
 
 	if ContainsOnlyNumber(digitsOnly) != nil {
-		return errors.New("invalid phone")
+		return validationErr("invalid phone")
 	}
 
 	if len(digitsOnly) < 10 || len(digitsOnly) > 15 {
-		return errors.New("phone length is invalid")
+		return validationErr("phone length is invalid")
 	}
 
 	return nil
@@ -87,16 +103,16 @@ func IsPhoneValid(phone string) error {
 
 func IsImageURLValid(imageURL string) error {
 	if imageURL == "" {
-		return errors.New("image URL cannot be empty")
+		return nil
 	}
 
 	u, err := url.ParseRequestURI(imageURL)
 	if err != nil {
-		return errors.New("invalid URL format")
+		return validationErr("invalid URL format")
 	}
 
 	if u.Scheme != "http" && u.Scheme != "https" {
-		return errors.New("URL must use http or https scheme")
+		return validationErr("URL must use http or https scheme")
 	}
 
 	path := strings.ToLower(u.Path)
@@ -111,7 +127,7 @@ func IsImageURLValid(imageURL string) error {
 	}
 
 	if !isImage {
-		return errors.New("URL must point to a valid image file (.jpg, .png, .webp, etc.)")
+		return validationErr("URL must point to a valid image file (.jpg, .png, .webp, etc.)")
 	}
 
 	return nil
@@ -119,7 +135,7 @@ func IsImageURLValid(imageURL string) error {
 
 func IsDescriptionValid(desc string) error {
 	if utf8.RuneCountInString(desc) > 255 {
-		return errors.New("description is too long")
+		return validationErr("description is too long")
 	}
 	return nil
 }
