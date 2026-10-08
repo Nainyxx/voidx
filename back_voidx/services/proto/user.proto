@@ -1,0 +1,66 @@
+syntax = "proto3";
+package user.v1;
+option go_package = "example.com/voidx/proto/UserService;userv1";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// STRUCTS
+service UserService {
+    rpc GetUserProfileByID (GetUserProfileByIdRequest) returns (GetUserProfileByIdResponse);
+    rpc CreateUserProfile (CreateUserProfileRequest) returns (CreateUserProfileResponse);
+    rpc UpdateUserProfile (UpdateUserProfileRequest) returns (UpdateUserProfileResponse);
+    rpc DeleteUserProfile (DeleteUserProfileRequest) returns (google.protobuf.Empty);
+}
+
+message User {
+    string user_id = 1;
+    string username = 2;
+    string name = 3;
+    string surname = 4;
+    string phone = 5;
+    string description = 6;
+    string avatar_image_url = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+}
+
+// REQUESTS
+message GetUserProfileByIdRequest {
+    string user_id = 1;
+}
+
+message CreateUserProfileRequest {
+    string user_id = 1;
+    string username = 2;
+    string name = 3;
+    string surname = 4;
+    string phone = 5;
+}
+
+message UpdateUserProfileRequest {
+    string user_id = 1;
+    optional string username = 2;
+    optional string name = 3;
+    optional string surname = 4;
+    optional string phone = 5;
+    optional string description = 6;
+    optional string avatar_image_url = 7;
+}
+
+message DeleteUserProfileRequest {
+    string user_id = 1;
+}
+
+// RESPONSES
+message GetUserProfileByIdResponse {
+    User user = 1;
+}
+
+message CreateUserProfileResponse {
+    User user = 1;
+}
+
+message UpdateUserProfileResponse {
+    User user = 1;
+}
