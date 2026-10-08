@@ -3,8 +3,11 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
-	"uuid"
+
+	"github.com/google/uuid"
+	"github.com/lib/pq"
 
 	"example.com/m/models"
 )
@@ -17,25 +20,29 @@ func NewPostgresRepo(db *sql.DB) UserRepository {
 	return &postgresRepo{db: db}
 }
 
-func ConnectDB(host, port, user, password, dbname string) (*sql.DB, error) {
+func formatErr(err error) error {
+	return fmt.Errorf("Repo: %w", err)
+}
+
+func ConnectDB(host, port, user, password, dbname, sslmode string) (*sql.DB, error) {
 	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname,
+		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslmode,
 	)
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("failed to open connection: %w", err)
+		return nil, formatErr(fmt.Errorf("failed to open connection: %w", err))
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to ping database: %w", err)
+		return nil, formatErr(fmt.Errorf("failed to ping database: %w", err))
 	}
 
 	return db, nil
 }
 
-// GET
+// GetUserProfileByID
 func (repo *postgresRepo) GetUserProfileByID(ctx context.Context, userID uuid.UUID) (*models.UserProfile, error) {
 	query := `
         SELECT user_id, username, name, surname, phone, description, avatar_image_url, created_at, updated_at
@@ -56,17 +63,17 @@ func (repo *postgresRepo) GetUserProfileByID(ctx context.Context, userID uuid.UU
 		&profile.UpdatedAt,
 	)
 
-	if err == sql.ErrNoRows {
-		return nil, fmt.Errorf("profile not found")
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, formatErr(ErrNotFound)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("database error: %w", err)
+		return nil, formatErr(fmt.Errorf("database error: %w", err))
 	}
 
 	return profile, nil
 }
 
-// POST
+// CreateUserProfile
 func (repo *postgresRepo) CreateUserProfile(ctx context.Context, profile *models.UserProfile) error {
 	query := `
         INSERT INTO user_profiles (user_id, username, name, surname, phone, description, avatar_image_url, created_at, updated_at)
@@ -86,13 +93,17 @@ func (repo *postgresRepo) CreateUserProfile(ctx context.Context, profile *models
 	)
 
 	if err != nil {
-		return fmt.Errorf("failed to create profile: %w", err)
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return formatErr(ErrAlreadyExists)
+		}
+		return formatErr(fmt.Errorf("failed to create profile: %w", err))
 	}
 
 	return nil
 }
 
-// PATCH
+// UpdateUserProfile
 func (repo *postgresRepo) UpdateUserProfile(ctx context.Context, profile *models.UserProfile) error {
 	query := `
         UPDATE user_profiles
@@ -107,21 +118,25 @@ func (repo *postgresRepo) UpdateUserProfile(ctx context.Context, profile *models
 		profile.UserID,
 	)
 	if err != nil {
-		return fmt.Errorf("database error: %w", err)
+		var pqErr *pq.Error
+		if errors.As(err, &pqErr) && pqErr.Code == "23505" {
+			return formatErr(ErrAlreadyExists)
+		}
+		return formatErr(fmt.Errorf("database error: %w", err))
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("database error: %w", err)
+		return formatErr(fmt.Errorf("database error: %w", err))
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("profile not found")
+		return formatErr(ErrNotFound)
 	}
 
 	return nil
 }
 
-// DELETE
+// DeleteUserProfile
 func (repo *postgresRepo) DeleteUserProfile(ctx context.Context, userID uuid.UUID) error {
 	query := `
 		DELETE FROM user_profiles WHERE user_id = $1
@@ -129,14 +144,14 @@ func (repo *postgresRepo) DeleteUserProfile(ctx context.Context, userID uuid.UUI
 
 	result, err := repo.db.ExecContext(ctx, query, userID)
 	if err != nil {
-		return fmt.Errorf("database error: %w", err)
+		return formatErr(fmt.Errorf("database error: %w", err))
 	}
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("database error: %w", err)
+		return formatErr(fmt.Errorf("database error: %w", err))
 	}
 	if rowsAffected == 0 {
-		return fmt.Errorf("profile not found")
+		return formatErr(ErrNotFound)
 	}
 
 	return nil
